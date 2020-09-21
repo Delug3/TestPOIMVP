@@ -10,12 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delug3.testpoi.R
 import com.delug3.testpoi.adapter.PoisAdapter
+import com.delug3.testpoi.database.PoiViewModel
+import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
 import com.delug3.testpoi.poidetails.PoiDetailsActivity
 import java.util.*
 
 class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickListener {
     private var recyclerViewPoi: RecyclerView? = null
+    private lateinit var poiViewModel: PoiViewModel
     var searchViewPoi: SearchView? = null
     private var poisAdapter: PoisAdapter? = null
     var poiList: MutableList<Poi?> = ArrayList()
@@ -27,10 +30,15 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
 
         //Initializing Presenter
         poiListPresenter = PoiListPresenter(this)
+
         initUI()
         setUpSearchView()
         setUpRecyclerView()
         checkInternetConnection()
+
+        //testing insert
+       // val word = PoiRoom("variable test")
+        //poiViewModel.insert(word)
     }
 
     /**
@@ -74,10 +82,16 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
     override fun showProgress() {}
     override fun hideProgress() {}
 
-    override fun sendDataToRecyclerView(poiArrayList: List<Poi?>?) {
-        poiList.addAll(poiArrayList!!)
+    override fun sendDataToRecyclerView(poiOnlineList: List<Poi?>?) {
+        poiList.addAll(poiOnlineList!!)
         poisAdapter!!.notifyDataSetChanged()
     }
+
+
+    override fun sendDataToRoomDataBase(poiOfflineList: List<PoiRoom?>?) {
+        poiViewModel.insertAllPois(poiOfflineList)
+     val readvalues=   poiViewModel.allPois
+       }
 
     /**
      * method that obtain id of POI every time that the user click on an item
