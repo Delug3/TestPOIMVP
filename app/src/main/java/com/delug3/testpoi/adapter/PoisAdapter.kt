@@ -1,6 +1,5 @@
 package com.delug3.testpoi.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +8,15 @@ import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delug3.testpoi.R
+import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
-import com.delug3.testpoi.poilist.PoiItemClickListener
 import com.delug3.testpoi.poilist.PoiListActivity
 import java.util.*
 
 class PoisAdapter(private val poiListActivity: PoiListActivity, private val poiList: MutableList<Poi?>) : RecyclerView.Adapter<PoisAdapter.ViewHolder>(), Filterable {
 
     private var poiListFiltered: MutableList<Poi?>
-    private val poiItemClickListener: PoiItemClickListener? = null
+    private var cachedPois = emptyList<PoiRoom>() // Cached copy of Pois
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pois, parent, false)
         return ViewHolder(view)
@@ -28,6 +27,11 @@ class PoisAdapter(private val poiListActivity: PoiListActivity, private val poiL
         holder.textViewTitle.text = poi?.title
         holder.textViewGeocoordinates.text = poi?.geocoordinates
         holder.itemView.setOnClickListener { poiListActivity.onPoiItemClick(position) }
+    }
+
+    internal fun setPois(poiRoom: List<PoiRoom>) {
+        this.cachedPois = poiRoom
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -73,7 +77,7 @@ class PoisAdapter(private val poiListActivity: PoiListActivity, private val poiL
 
         init {
             textViewTitle = itemView.findViewById(R.id.text_view_title)
-            textViewGeocoordinates = itemView.findViewById(R.id.text_view_address)
+            textViewGeocoordinates = itemView.findViewById(R.id.text_view_geocoordinates)
         }
     }
 
