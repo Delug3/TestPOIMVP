@@ -22,15 +22,22 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "poi_table")
-data class PoiRoom(
-        
-        val title:String,
-        val address:String,
-        val transport:String,
-        val email:String,
-        val geocoordinates:String,
-        val description:String )
+class PoiRoom(
 
-        {@PrimaryKey(autoGenerate = true)
-        var id: Int = 0
-}
+        @PrimaryKey
+        @ColumnInfo(name = "id")
+        val id: String,
+        @ColumnInfo(name = "title")
+        val title: String?,
+        @ColumnInfo(name = "address")
+        val address: String?,
+        @ColumnInfo(name = "transport")
+        val transport: String?,
+        @ColumnInfo(name = "email")
+        val email: String?,
+        @ColumnInfo(name = "geocoordinates")
+        val geocoordinates: String?,
+        @ColumnInfo(name = "description")
+        val description: String?)
+
+
