@@ -1,42 +1,34 @@
-package com.delug3.testpoi.database.poirepository
+package com.delug3.testpoi.database
 
 
-import android.app.Application
-import android.os.AsyncTask
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-
-import com.delug3.testpoi.database.PoiDatabase
 import com.delug3.testpoi.database.dao.PoiDao
 import com.delug3.testpoi.database.entity.PoiRoom
-import io.reactivex.Observable
 
 
-class PoiRepository(application: Application) {
+class PoiRepository(private val poiDao: PoiDao) {
+
+    // Room executes all queries on a separate thread.
+    // Observed LiveData will notify the observer when the data has changed.
+    val allPois: LiveData<List<PoiRoom>> = poiDao.getAllPois()
 
 
-    private lateinit var poiDao: PoiDao
-    private var allPois: LiveData<List<PoiRoom>>
-
-    init {
-        val database: PoiDatabase? = PoiDatabase.getInstance(application)
-        if (database != null) {
-            poiDao = database.poiDao()
-        }
-       allPois = poiDao.getAllPois()
+    // You must call this on a non-UI thread or your app will crash. So we're making this a
+    // suspend function so the caller methods know this.
+    // Like this, Room ensures that you're not doing any long running operations on the main
+    // thread, blocking the UI.
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insert(poiRoom: PoiRoom) {
+        poiDao.insert(poiRoom)
     }
-    fun insert(poiRoom: PoiRoom){
-        val insertPoiAsyncTask = InsertPoiAsyncTask(poiDao).execute(poiRoom)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insertAllPois(poisRoomList: List<PoiRoom?>?) {
+        poiDao.insertAllPois(poisRoomList)
     }
 
-    fun getAllPois(): LiveData<List<PoiRoom>>{
-        return allPois
-    }
-    private class InsertPoiAsyncTask(poiDao: PoiDao) : AsyncTask<PoiRoom, Unit, Unit>() {
-        val poiDao = poiDao
-
-        override fun doInBackground(vararg p0: PoiRoom?) {
-         poiDao.insert(p0[0]!!)
-        }
-    }
 
 }
