@@ -1,7 +1,6 @@
 package com.delug3.testpoi.poilist
 
 import android.util.Log
-import com.delug3.testpoi.database.dao.PoiDao
 import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
 import com.delug3.testpoi.model.PoiResponse
@@ -11,35 +10,31 @@ import com.delug3.testpoi.poilist.PoiListContract.Model.OnFinishedListener
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
-class PoiListModel : PoiListContract.Model {
-        /**
+
+class PoiListModel () : PoiListContract.Model {
+    /**
      * getting all data from endpoint asynchronously
      */
     override fun getOnlineData(onFinishedListener: OnFinishedListener?) {
 
-        //calling instance with url(http://t21services.herokuapp.com/)
         val service = client!!.create(ApiInterface::class.java)
         val call = service.pOIs
         call!!.enqueue(object : Callback<PoiResponse?> {
             override fun onResponse(call: Call<PoiResponse?>, response: Response<PoiResponse?>) {
                 if (response.isSuccessful) {
-                    val poiResponse = response.body()
-                    val poiList: ArrayList<Poi>? = poiResponse!!.list
 
-                    //HERE RESPONSE DATA TO LOCAL DATABASE->POIDAO(insertAll)
-                    //not working
-                    /*val poiListRoom: ArrayList<PoiRoom>?
-                    if (poiList != null) {
-                        for (i in poiList)
+                    val result = response.body()
+                    //here i send the response to a poi model to show it in a recyclerview, works fine
+                    val poiList = result?.list
 
-                    }
-                    poiDao.insertAllPois(poiList)
-                    */
+                    //mapping poilist so I can use it in the room database
+                    //same list and variables but different type Poi-PoiRoom
+                    val mappedRoomList = poiList?.map { PoiRoom(it.id, it.title, it.address, it.transport, it.email, it.geocoordinates, it.description) }
+
+                    onFinishedListener!!.onFinished(poiList, mappedRoomList)
 
 
-                    onFinishedListener!!.onFinished(poiList)
                 } else {
                     Log.e(TAG, "onResponse: " + response.errorBody())
                 }
@@ -90,7 +85,7 @@ class PoiListModel : PoiListContract.Model {
      */
     override fun getOfflineData(onFinishedListener: OnFinishedListener?) {
 
-        //poiDao.getAllPois()
+
 
     }
 
