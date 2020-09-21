@@ -1,7 +1,7 @@
 package com.delug3.testpoi.model
 
 class Poi {
-    var id: String? = null
+    lateinit var id: String
     var title: String? = null
     var address: String? = null
     var transport: String? = null
