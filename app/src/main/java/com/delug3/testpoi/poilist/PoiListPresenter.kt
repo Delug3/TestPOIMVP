@@ -1,5 +1,6 @@
 package com.delug3.testpoi.poilist
 
+import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
 import com.delug3.testpoi.poilist.PoiListContract.Model.OnFinishedListener
 import com.delug3.testpoi.poilist.PoiListContract.Presenter
@@ -31,8 +32,9 @@ class PoiListPresenter(private var poiListView: PoiListContract.View?) : Present
         poiListModel.getOfflineData(this)
     }
 
-    override fun onFinished(poiArrayList: List<Poi?>?) {
-        poiListView!!.sendDataToRecyclerView(poiArrayList)
+    override fun onFinished(poiList: List<Poi?>?, mappedPoiRoom: List<PoiRoom?>?) {
+        poiListView!!.sendDataToRecyclerView(poiList)
+        poiListView!!.sendDataToRoomDataBase(mappedPoiRoom)
         if (poiListView != null) {
             poiListView!!.hideProgress()
         }
