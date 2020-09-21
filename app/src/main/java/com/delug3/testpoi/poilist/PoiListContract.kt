@@ -1,5 +1,6 @@
 package com.delug3.testpoi.poilist
 
+import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
 
 /**
@@ -8,7 +9,7 @@ import com.delug3.testpoi.model.Poi
 interface PoiListContract {
     interface Model {
         interface OnFinishedListener {
-            fun onFinished(poiArrayList: List<Poi?>?)
+            fun onFinished(poiList: List<Poi?>?,mappedPoiRoom: List<PoiRoom?>?)
             fun onDetailsFinished(title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?)
             fun onFailure(t: Throwable?)
         }
@@ -21,7 +22,8 @@ interface PoiListContract {
     interface View {
         fun showProgress()
         fun hideProgress()
-        fun sendDataToRecyclerView(poiArrayList: List<Poi?>?)
+        fun sendDataToRecyclerView(poiOnlineList: List<Poi?>?)
+        fun sendDataToRoomDataBase(poiOfflineList: List<PoiRoom?>?)
         fun showPoiDetails(title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?)
         fun onResponseFailure(throwable: Throwable?)
     }
