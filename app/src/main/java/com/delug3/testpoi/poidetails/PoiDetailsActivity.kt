@@ -54,7 +54,7 @@ class PoiDetailsActivity : AppCompatActivity() {
 
     private fun initUI() {
         textViewTitle = findViewById(R.id.text_view_title)
-        textViewAddress = findViewById(R.id.text_view_address)
+        textViewAddress = findViewById(R.id.text_view_geocoordinates)
         textViewTransport = findViewById(R.id.text_view_transport)
         textViewEmail = findViewById(R.id.text_view_email)
         textViewGeocoordinates = findViewById(R.id.text_view_geocoordinates)
