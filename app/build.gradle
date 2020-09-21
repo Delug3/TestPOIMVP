@@ -62,5 +62,12 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroid_version"
 
 
+    // Lifecycle components
+    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
+    kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.archLifecycleVersion"
+
+    //gson
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
 }
