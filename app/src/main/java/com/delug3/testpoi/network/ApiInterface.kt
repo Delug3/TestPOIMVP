@@ -9,9 +9,9 @@ import retrofit2.http.Path
 interface ApiInterface {
     //with this endpoint I can obtain all the POIs
     @get:GET("points")
-    val pOIs: Call<PoiResponse?>?
+    val pois: Call<PoiResponse?>?
 
     //this get require an id for obtaining one single object with the detail info
     @GET("points/{id}")
-    fun getPOI(@Path(value = "id", encoded = true) id: String?): Call<Poi?>?
+    fun getPoi(@Path(value = "id", encoded = true) id: String?): Call<Poi?>?
 }
