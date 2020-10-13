@@ -19,7 +19,7 @@ class PoiListModel () : PoiListContract.Model {
     override fun getOnlineData(onFinishedListener: OnFinishedListener?) {
 
         val service = client!!.create(ApiInterface::class.java)
-        val call = service.pOIs
+        val call = service.pois
         call!!.enqueue(object : Callback<PoiResponse?> {
             override fun onResponse(call: Call<PoiResponse?>, response: Response<PoiResponse?>) {
                 if (response.isSuccessful) {
@@ -33,7 +33,6 @@ class PoiListModel () : PoiListContract.Model {
                     val mappedRoomList = poiList?.map { PoiRoom(it.id, it.title, it.address, it.transport, it.email, it.geocoordinates, it.description) }
 
                     onFinishedListener!!.onFinished(poiList, mappedRoomList)
-
 
                 } else {
                     Log.e(TAG, "onResponse: " + response.errorBody())
@@ -53,9 +52,9 @@ class PoiListModel () : PoiListContract.Model {
      * @param onFinishedListener: listener to know when the query ends
      * @param idPoi: string where the id of the poi object is stored
      */
-    override fun getPoiDetails(onFinishedListener: OnFinishedListener?, idPoi: String?) {
+    override fun getPoiDetails(onFinishedListener: OnFinishedListener?, idPoi: String) {
         val service = client!!.create(ApiInterface::class.java)
-        val call = service.getPOI(idPoi)
+        val call = service.getPoi(idPoi)
         call!!.enqueue(object : Callback<Poi?> {
             override fun onResponse(call: Call<Poi?>, response: Response<Poi?>) {
                 if (response.isSuccessful) {
@@ -68,7 +67,7 @@ class PoiListModel () : PoiListContract.Model {
 
                     //sending data from respond to a method with an intent
                     //this method will open a new activity with the detailed information
-                    onFinishedListener!!.onDetailsFinished(title, address, transport, email, geocoordinates, description)
+                    onFinishedListener!!.onDetailsFinished(idPoi,title, address, transport, email, geocoordinates, description)
                 } else {
                     Log.e(TAG, "onResponse: " + response.errorBody())
                 }
@@ -88,6 +87,8 @@ class PoiListModel () : PoiListContract.Model {
 
 
     }
+
+
 
     companion object {
         private const val TAG = "POIs"
