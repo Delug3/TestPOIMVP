@@ -11,7 +11,10 @@ class PoiRepository(private val poiDao: PoiDao) {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    val allPois: LiveData<List<PoiRoom>> = poiDao.getAllPois()
+
+    val allPois: LiveData<List<PoiRoom>> = poiDao.readAllPois()
+
+    //val singlePoi:LiveData<List<PoiRoom>> = poiDao.readSinglePoi("")
 
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
@@ -29,6 +32,20 @@ class PoiRepository(private val poiDao: PoiDao) {
     suspend fun insertAllPois(poisRoomList: List<PoiRoom?>?) {
         poiDao.insertAllPois(poisRoomList)
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun updatePoi(id: String, address: String?, transport: String?, email: String?, description: String?){
+        poiDao.updatePoi(id, address, transport, email, description)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun readSinglePoi(id: String): LiveData<List<PoiRoom>> {
+      return poiDao.readSinglePoi(id)
+    }
+
+
 
 
 }
