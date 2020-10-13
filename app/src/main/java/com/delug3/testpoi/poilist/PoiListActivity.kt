@@ -1,11 +1,16 @@
 package com.delug3.testpoi.poilist
 
+import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delug3.testpoi.R
@@ -14,7 +19,7 @@ import com.delug3.testpoi.database.PoiViewModel
 import com.delug3.testpoi.database.entity.PoiRoom
 import com.delug3.testpoi.model.Poi
 import com.delug3.testpoi.poidetails.PoiDetailsActivity
-import java.util.*
+
 
 class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickListener {
     private var recyclerViewPoi: RecyclerView? = null
@@ -30,11 +35,13 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
 
         //Initializing Presenter
         poiListPresenter = PoiListPresenter(this)
+        // Get a new or existing ViewModel from the ViewModelProvider.
+        poiViewModel = ViewModelProvider(this).get(PoiViewModel::class.java)
 
         initUI()
         setUpSearchView()
         setUpRecyclerView()
-        checkInternetConnection()
+        loadData()
 
         //testing insert
        // val word = PoiRoom("variable test")
@@ -90,8 +97,12 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
 
     override fun sendDataToRoomDataBase(poiOfflineList: List<PoiRoom?>?) {
         poiViewModel.insertAllPois(poiOfflineList)
-     val readvalues=   poiViewModel.allPois
        }
+
+    override fun updateFieldInRoomDataBase(idPoi: String, address: String?, transport: String?, email: String?, description: String?) {
+        poiViewModel.updatePoi(idPoi, address, transport, email, description)
+    }
+
 
     /**
      * method that obtain id of POI every time that the user click on an item
@@ -100,7 +111,17 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
     override fun onPoiItemClick(position: Int) {
         val poi = poisAdapter!!.getFilteredItem(position)
         val idPoi = poi?.id
-        poiListPresenter!!.requestDataDetails(idPoi)
+        val connection = isInternetAvailable(this)
+        if (connection) {
+            if (idPoi != null) {
+                poiListPresenter!!.requestDataDetails(idPoi)
+            }
+        } else {
+            if (idPoi != null) {
+                readDataDetailsFromDataBase(idPoi)
+            }
+        }
+
     }
 
     /**
@@ -128,15 +149,79 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
      * if it's available, get data from api
      * if isn't available, get data from room database
      */
-    private fun checkInternetConnection() {
-        val connectivityManager = this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val currentNetworkInfo = connectivityManager.activeNetworkInfo
-        //improve this!!
-        if (currentNetworkInfo!!.isConnected) {
+    private fun loadData() {
+        val connection = isInternetAvailable(this)
+        if (connection) {
             poiListPresenter!!.requestAllDataFromUrl()
         } else {
-            poiListPresenter!!.requestDataFromDataBase()
+            //poiListPresenter!!.requestDataFromDataBase()
+            readAllDataFromDataBase()
         }
+    }
+
+
+    private fun readAllDataFromDataBase() {
+       poiViewModel.allPois.observe(this, Observer { pois ->
+           // Update the cached copy of the words in the adapter.
+           pois?.let { poisAdapter?.setPois(it) }
+       })
+    }
+
+    private fun readDataDetailsFromDataBase(idPoi: String){
+       //poiViewModel.singlePoi.observe(this, Observer<List<PoiRoom?>?> { poi -> readPoi(poi) })
+        poiViewModel.readSinglePoi(idPoi).observe(this, Observer<List<PoiRoom?>?> { singlePoiRoom -> readPoi(singlePoiRoom) })
+    }
+
+    private fun readPoi(singlePoiRoom: List<PoiRoom?>?) {
+        if (singlePoiRoom != null) {
+            for (singlePoi in singlePoiRoom) {
+                val title = singlePoi?.title
+                val address = singlePoi?.address
+                val transport = singlePoi?.transport
+                val email = singlePoi?.email
+                val geocoordinates = singlePoi?.geocoordinates
+                val description = singlePoi?.description
+
+
+                showPoiDetails(title, address, transport, email, geocoordinates, description)
+            }
+
+        }
+
+    }
+
+
+
+
+    private fun isInternetAvailable(context: Context): Boolean {
+        var result = false
+        val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val networkCapabilities = connectivityManager.activeNetwork ?: return false
+            val actNw =
+                    connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            result = when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.run {
+                connectivityManager.activeNetworkInfo?.run {
+                    result = when (type) {
+                        ConnectivityManager.TYPE_WIFI -> true
+                        ConnectivityManager.TYPE_MOBILE -> true
+                        ConnectivityManager.TYPE_ETHERNET -> true
+                        else -> false
+                    }
+
+                }
+            }
+        }
+
+        return result
     }
 
     override fun onResponseFailure(throwable: Throwable?) {
