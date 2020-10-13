@@ -18,7 +18,7 @@ class PoiListPresenter(private var poiListView: PoiListContract.View?) : Present
         poiListModel.getOnlineData(this)
     }
 
-    override fun requestDataDetails(idPoi: String?) {
+    override fun requestDataDetails(idPoi: String) {
         if (poiListView != null) {
             poiListView!!.showProgress()
         }
@@ -40,7 +40,8 @@ class PoiListPresenter(private var poiListView: PoiListContract.View?) : Present
         }
     }
 
-    override fun onDetailsFinished(title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?) {
+    override fun onDetailsFinished(idPoi: String, title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?) {
+        poiListView!!.updateFieldInRoomDataBase(idPoi, address, transport, email, description)
         poiListView!!.showPoiDetails(title, address, transport, email, geocoordinates, description)
         if (poiListView != null) {
             poiListView!!.hideProgress()
