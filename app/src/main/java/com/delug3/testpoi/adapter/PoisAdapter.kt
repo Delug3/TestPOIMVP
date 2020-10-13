@@ -15,8 +15,7 @@ import java.util.*
 
 class PoisAdapter(private val poiListActivity: PoiListActivity, private val poiList: MutableList<Poi?>) : RecyclerView.Adapter<PoisAdapter.ViewHolder>(), Filterable {
 
-    private var poiListFiltered: MutableList<Poi?>
-    private var cachedPois = emptyList<PoiRoom>() // Cached copy of Pois
+    private var poiListFiltered: List<Poi?>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pois, parent, false)
         return ViewHolder(view)
@@ -29,8 +28,11 @@ class PoisAdapter(private val poiListActivity: PoiListActivity, private val poiL
         holder.itemView.setOnClickListener { poiListActivity.onPoiItemClick(position) }
     }
 
-    internal fun setPois(poiRoom: List<PoiRoom>) {
-        this.cachedPois = poiRoom
+    internal fun setPois(poisFromDataBase: List<PoiRoom>) {
+
+        val mappedRoomList = poisFromDataBase?.map { Poi(it.id, it.title, it.address, it.transport, it.email, it.geocoordinates, it.description) }
+
+        this.poiListFiltered = mappedRoomList
         notifyDataSetChanged()
     }
 
