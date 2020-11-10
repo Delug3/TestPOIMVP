@@ -12,7 +12,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class PoiListModel () : PoiListContract.Model {
+class PoiListModel() : PoiListContract.Model {
     /**
      * getting all data from endpoint asynchronously
      */
@@ -85,9 +85,7 @@ class PoiListModel () : PoiListContract.Model {
     override fun getOfflineData(onFinishedListener: OnFinishedListener?) {
 
 
-
     }
-
 
 
     companion object {

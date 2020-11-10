@@ -9,7 +9,7 @@ import com.delug3.testpoi.model.Poi
 interface PoiListContract {
     interface Model {
         interface OnFinishedListener {
-            fun onFinished(poiList: List<Poi?>?,mappedPoiRoom: List<PoiRoom?>?)
+            fun onFinished(poiList: List<Poi?>?, mappedPoiRoom: List<PoiRoom?>?)
             fun onDetailsFinished(idPoi: String, title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?)
             fun onFailure(t: Throwable?)
         }

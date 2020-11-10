@@ -86,7 +86,7 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
 
     override fun sendDataToRoomDataBase(poiOfflineList: List<PoiRoom?>?) {
         poiViewModel.insertAllPois(poiOfflineList)
-       }
+    }
 
     override fun updateFieldInRoomDataBase(idPoi: String, address: String?, transport: String?, email: String?, description: String?) {
         poiViewModel.updatePoi(idPoi, address, transport, email, description)
@@ -145,13 +145,13 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
 
 
     private fun readAllDataFromDataBase() {
-       poiViewModel.allPois.observe(this, Observer { pois ->
-           // Update the cached copy of the words in the adapter.
-           pois?.let { poisAdapter?.setPois(it) }
-       })
+        poiViewModel.allPois.observe(this, Observer { pois ->
+            // Update the cached copy of the words in the adapter.
+            pois?.let { poisAdapter?.setPois(it) }
+        })
     }
 
-    private fun readDataDetailsFromDataBase(idPoi: String){
+    private fun readDataDetailsFromDataBase(idPoi: String) {
         poiViewModel.readSinglePoi(idPoi).observe(this, { singlePoiRoom -> readPoi(singlePoiRoom) })
     }
 
