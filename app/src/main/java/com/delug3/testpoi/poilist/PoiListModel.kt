@@ -18,8 +18,8 @@ class PoiListModel () : PoiListContract.Model {
      */
     override fun getOnlineData(onFinishedListener: OnFinishedListener?) {
 
-        val service = client!!.create(ApiInterface::class.java)
-        val call = service.pois
+        val service = client?.create(ApiInterface::class.java)
+        val call = service?.pois
         call!!.enqueue(object : Callback<PoiResponse?> {
             override fun onResponse(call: Call<PoiResponse?>, response: Response<PoiResponse?>) {
                 if (response.isSuccessful) {
@@ -53,21 +53,21 @@ class PoiListModel () : PoiListContract.Model {
      * @param idPoi: string where the id of the poi object is stored
      */
     override fun getPoiDetails(onFinishedListener: OnFinishedListener?, idPoi: String) {
-        val service = client!!.create(ApiInterface::class.java)
-        val call = service.getPoi(idPoi)
+        val service = client?.create(ApiInterface::class.java)
+        val call = service?.getPoi(idPoi)
         call!!.enqueue(object : Callback<Poi?> {
             override fun onResponse(call: Call<Poi?>, response: Response<Poi?>) {
                 if (response.isSuccessful) {
-                    val title = response.body()!!.title
-                    val address = response.body()!!.address
-                    val transport = response.body()!!.transport
-                    val email = response.body()!!.email
-                    val geocoordinates = response.body()!!.geocoordinates
-                    val description = response.body()!!.description
+                    val title = response.body()?.title
+                    val address = response.body()?.address
+                    val transport = response.body()?.transport
+                    val email = response.body()?.email
+                    val geocoordinates = response.body()?.geocoordinates
+                    val description = response.body()?.description
 
                     //sending data from respond to a method with an intent
                     //this method will open a new activity with the detailed information
-                    onFinishedListener!!.onDetailsFinished(idPoi,title, address, transport, email, geocoordinates, description)
+                    onFinishedListener!!.onDetailsFinished(idPoi, title, address, transport, email, geocoordinates, description)
                 } else {
                     Log.e(TAG, "onResponse: " + response.errorBody())
                 }
