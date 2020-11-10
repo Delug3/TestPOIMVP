@@ -12,64 +12,51 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.delug3.testpoi.R
 import com.delug3.testpoi.adapter.PoisAdapter
 import com.delug3.testpoi.database.PoiViewModel
 import com.delug3.testpoi.database.entity.PoiRoom
+import com.delug3.testpoi.databinding.ActivityMainPoisBinding
 import com.delug3.testpoi.model.Poi
 import com.delug3.testpoi.poidetails.PoiDetailsActivity
 
 
 class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickListener {
-    private var recyclerViewPoi: RecyclerView? = null
     private lateinit var poiViewModel: PoiViewModel
-    var searchViewPoi: SearchView? = null
     private var poisAdapter: PoisAdapter? = null
     var poiList: MutableList<Poi?> = ArrayList()
     private var poiListPresenter: PoiListPresenter? = null
+    lateinit var binding: ActivityMainPoisBinding
+    //val recyclerPoi: RecyclerView = binding.recyclerViewPois
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_pois)
+        binding = ActivityMainPoisBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         //Initializing Presenter
         poiListPresenter = PoiListPresenter(this)
         // Get a new or existing ViewModel from the ViewModelProvider.
         poiViewModel = ViewModelProvider(this).get(PoiViewModel::class.java)
 
-        initUI()
         setUpSearchView()
         setUpRecyclerView()
         loadData()
-
-        //testing insert
-       // val word = PoiRoom("variable test")
-        //poiViewModel.insert(word)
-    }
-
-    /**
-     * initialization of views, not required butterknife for now
-     */
-    private fun initUI() {
-        recyclerViewPoi = findViewById(R.id.recyclerViewPois)
-        searchViewPoi = findViewById(R.id.search_view_poi)
     }
 
     /**
      * setting up search view, in order to filter POIs results
      */
     private fun setUpSearchView() {
-        searchViewPoi!!.queryHint = "Look for POIs..."
-        searchViewPoi!!.setIconifiedByDefault(false)
-        searchViewPoi!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchViewPoi.queryHint = "Look for POIs..."
+        binding.searchViewPoi.setIconifiedByDefault(false)
+        binding.searchViewPoi.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return false
             }
 
             //filter results every time that something changes
             override fun onQueryTextChange(query: String): Boolean {
-                poisAdapter!!.filter.filter(query)
+                poisAdapter?.filter?.filter(query)
                 return false
             }
         })
@@ -80,17 +67,19 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
      */
     private fun setUpRecyclerView() {
         poisAdapter = PoisAdapter(this, poiList)
-        recyclerViewPoi!!.adapter = poisAdapter
-        recyclerViewPoi!!.setHasFixedSize(true)
+        binding.recyclerViewPois.adapter = poisAdapter
+        binding.recyclerViewPois.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
-        recyclerViewPoi!!.layoutManager = layoutManager
+        binding.recyclerViewPois.layoutManager = layoutManager
     }
 
     override fun showProgress() {}
+
     override fun hideProgress() {}
 
     override fun sendDataToRecyclerView(poiOnlineList: List<Poi?>?) {
-        poiList.addAll(poiOnlineList!!)
+        //poiList.addAll(poiOnlineList!!)
+        poiOnlineList?.let { poiList.addAll(it) }
         poisAdapter!!.notifyDataSetChanged()
     }
 
@@ -113,15 +102,10 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
         val idPoi = poi?.id
         val connection = isInternetAvailable(this)
         if (connection) {
-            if (idPoi != null) {
-                poiListPresenter!!.requestDataDetails(idPoi)
-            }
+            idPoi?.let { poiListPresenter!!.requestDataDetails(it) }
         } else {
-            if (idPoi != null) {
-                readDataDetailsFromDataBase(idPoi)
-            }
+            idPoi?.let { readDataDetailsFromDataBase(it) }
         }
-
     }
 
     /**
@@ -152,7 +136,7 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
     private fun loadData() {
         val connection = isInternetAvailable(this)
         if (connection) {
-            poiListPresenter!!.requestAllDataFromUrl()
+            poiListPresenter?.requestAllDataFromUrl()
         } else {
             //poiListPresenter!!.requestDataFromDataBase()
             readAllDataFromDataBase()
@@ -168,8 +152,7 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
     }
 
     private fun readDataDetailsFromDataBase(idPoi: String){
-       //poiViewModel.singlePoi.observe(this, Observer<List<PoiRoom?>?> { poi -> readPoi(poi) })
-        poiViewModel.readSinglePoi(idPoi).observe(this, Observer<List<PoiRoom?>?> { singlePoiRoom -> readPoi(singlePoiRoom) })
+        poiViewModel.readSinglePoi(idPoi).observe(this, { singlePoiRoom -> readPoi(singlePoiRoom) })
     }
 
     private fun readPoi(singlePoiRoom: List<PoiRoom?>?) {
@@ -182,21 +165,15 @@ class PoiListActivity : AppCompatActivity(), PoiListContract.View, PoiItemClickL
                 val geocoordinates = singlePoi?.geocoordinates
                 val description = singlePoi?.description
 
-
                 showPoiDetails(title, address, transport, email, geocoordinates, description)
             }
-
         }
-
     }
-
-
 
 
     private fun isInternetAvailable(context: Context): Boolean {
         var result = false
-        val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val networkCapabilities = connectivityManager.activeNetwork ?: return false
             val actNw =
