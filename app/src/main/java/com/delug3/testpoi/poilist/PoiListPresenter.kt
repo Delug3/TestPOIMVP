@@ -12,47 +12,35 @@ class PoiListPresenter(private var poiListView: PoiListContract.View?) : Present
     }
 
     override fun requestAllDataFromUrl() {
-        if (poiListView != null) {
-            poiListView!!.showProgress()
-        }
+        poiListView?.showProgress()
         poiListModel.getOnlineData(this)
     }
 
     override fun requestDataDetails(idPoi: String) {
-        if (poiListView != null) {
-            poiListView!!.showProgress()
-        }
+        poiListView?.showProgress()
         poiListModel.getPoiDetails(this, idPoi)
     }
 
     override fun requestDataFromDataBase() {
-        if (poiListView != null) {
-            poiListView!!.showProgress()
-        }
+        poiListView?.showProgress()
         poiListModel.getOfflineData(this)
     }
 
     override fun onFinished(poiList: List<Poi?>?, mappedPoiRoom: List<PoiRoom?>?) {
-        poiListView!!.sendDataToRecyclerView(poiList)
-        poiListView!!.sendDataToRoomDataBase(mappedPoiRoom)
-        if (poiListView != null) {
-            poiListView!!.hideProgress()
-        }
+        poiListView?.sendDataToRecyclerView(poiList)
+        poiListView?.sendDataToRoomDataBase(mappedPoiRoom)
+        poiListView?.hideProgress()
     }
 
     override fun onDetailsFinished(idPoi: String, title: String?, address: String?, transport: String?, email: String?, geocoordinates: String?, description: String?) {
-        poiListView!!.updateFieldInRoomDataBase(idPoi, address, transport, email, description)
-        poiListView!!.showPoiDetails(title, address, transport, email, geocoordinates, description)
-        if (poiListView != null) {
-            poiListView!!.hideProgress()
-        }
+        poiListView?.updateFieldInRoomDataBase(idPoi, address, transport, email, description)
+        poiListView?.showPoiDetails(title, address, transport, email, geocoordinates, description)
+        poiListView?.hideProgress()
     }
 
     override fun onFailure(t: Throwable?) {
-        poiListView!!.onResponseFailure(t)
-        if (poiListView != null) {
-            poiListView!!.hideProgress()
-        }
+        poiListView?.onResponseFailure(t)
+        poiListView?.hideProgress()
     }
 
     init {
