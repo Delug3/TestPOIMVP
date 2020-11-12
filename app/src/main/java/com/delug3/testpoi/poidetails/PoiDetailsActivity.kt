@@ -1,22 +1,18 @@
 package com.delug3.testpoi.poidetails
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.delug3.testpoi.R
+import com.delug3.testpoi.databinding.ActivityPoisDetailsBinding
 
 class PoiDetailsActivity : AppCompatActivity() {
-    private var textViewTitle: TextView? = null
-    private var textViewAddress: TextView? = null
-    private var textViewTransport: TextView? = null
-    private var textViewEmail: TextView? = null
-    private var textViewGeocoordinates: TextView? = null
-    private var textViewDescription: TextView? = null
+
+    lateinit var binding: ActivityPoisDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pois_details)
-        initUI()
+        binding = ActivityPoisDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         val title: String?
         val address: String?
         val transport: String?
@@ -35,12 +31,12 @@ class PoiDetailsActivity : AppCompatActivity() {
                 geocoordinates = extras.getString("POI_GEOCOORDINATES")
                 description = extras.getString("POI_DESCRIPTION")
 
-                textViewTitle!!.text = title
-                textViewAddress!!.text = address
-                textViewTransport!!.text = transport
-                textViewEmail!!.text = email
-                textViewGeocoordinates!!.text = geocoordinates
-                textViewDescription!!.text = description
+                binding.textViewTitle.text = title
+                binding.textViewAddress.text = address
+                binding.textViewTransport.text = transport
+                binding.textViewEmail.text = email
+                binding.textViewGeocoordinates.text = geocoordinates
+                binding.textViewDescription.text = description
             }
         } else {
             savedInstanceState.getSerializable("POI_TITLE") as String?
@@ -52,12 +48,4 @@ class PoiDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun initUI() {
-        textViewTitle = findViewById(R.id.text_view_title)
-        textViewAddress = findViewById(R.id.text_view_geocoordinates)
-        textViewTransport = findViewById(R.id.text_view_transport)
-        textViewEmail = findViewById(R.id.text_view_email)
-        textViewGeocoordinates = findViewById(R.id.text_view_geocoordinates)
-        textViewDescription = findViewById(R.id.text_view_description)
-    }
 }
